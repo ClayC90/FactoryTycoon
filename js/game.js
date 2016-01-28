@@ -10,6 +10,7 @@ $(function($) {
 	var Game = {};
 	window.Game = Game;
 	var activeSave;
+	window.activeSave = activeSave;
 	
 	/* Game Window init */
 	$(function() {
@@ -27,22 +28,29 @@ $(function($) {
 		}
 		
 		gameUpdate = setInterval(Game.Update,60);
+		
+		try {
+			ko.applyBindings(activeSave);
+		}
+		catch(e) {
+			
+		}
 	}
 	
 	Game.Update = function() {
-		activeSave.lastFrame = Date.now();
+		activeSave.lastFrame(Date.now());
 	}
 	
 	/* Load and Save Feature */	
 	Game.CreateSave = function() {
 		return {
-			Money: 5000,
+			Money: ko.observable(5000),
 			Building: {},
 			Upgrades: {},
 			Stats: {},
 			version: 'alpha 1.0.0',
 			started: Date.now(),
-			lastFrame: Date.now()
+			lastFrame: ko.observable(Date.now())
 		}
 	}
 	
@@ -51,7 +59,15 @@ $(function($) {
 	}
 	
 	Game.Load = function() {
-		activeSave = Decode();
+		activeSave = Game.CreateSave();
+		
+		$.each(Decode(), function(i,j) {
+			if (typeof(j) !== 'object') {
+				activeSave[i] = ko.observable(j);
+			} else {
+				activeSave[i] = j;
+			}
+		});
 	}
 	
 	function Encode(s) {
