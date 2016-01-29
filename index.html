@@ -2,8 +2,12 @@
 	<head>
 		<title>Factory Tycoon</title>
 		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+		<style href="bootstrap/css/bootstrap.min.css"></style>
+		<style href="bootstrap/css/bootstrap-theme.min.css"></style>
+		
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script src='js/knockout-min.js'></script>
 		
 		<script src="js/game.js"></script>
 		<script src="js/model.js"></script>
@@ -12,10 +16,13 @@
 		<script src="js/controller.js"></script>
 	</head>
 	<body>
-		Factory Tycoon,<br>
-		an awesome game will be created here :) trust me, I know.<br><br>
+		<p>Factory Tycoon,</p>
+		<p>an awesome game will be created here :) trust me, I know</p>
 		
-		Don't beleive me?<br>
-		You wait and see, but stay tuned, bookmark this page and check back weekly :)
+		<p>Don't believe me?</p>
+		<p>You wait and see, but stay tuned, bookmark this page and check back weekly :)</p>
+		
+		<div data-bind="text: lastSave"></div>
+		<div data-bind="text: lastFrame"></div>
 	</body>
 </html>

@@ -5,7 +5,7 @@ $(function($) {
 
 	/* System Static Variables */
 	var savename = 'FTSave',
-		gameUpdate;
+		gameUpdate, autoSave;
 	
 	var Game = {};
 	window.Game = Game;
@@ -28,13 +28,9 @@ $(function($) {
 		}
 		
 		gameUpdate = setInterval(Game.Update,60);
+		autoSave = setInterval(Game.Save,2500);
 		
-		try {
-			ko.applyBindings(activeSave);
-		}
-		catch(e) {
-			
-		}
+		ko.applyBindings(activeSave);
 	}
 	
 	Game.Update = function() {
@@ -45,29 +41,57 @@ $(function($) {
 	Game.CreateSave = function() {
 		return {
 			Money: ko.observable(5000),
-			Building: {},
+			Building: window.Building,
 			Upgrades: {},
 			Stats: {},
 			version: 'alpha 1.0.0',
 			started: Date.now(),
+			lastSave: ko.observable(0),
 			lastFrame: ko.observable(Date.now())
 		}
 	}
 	
 	Game.Save = function() {
-		localStorage[savename] = Encode(activeSave);
+		activeSave.lastSave(Date.now());
+		
+		var save = Save(activeSave);
+		
+		localStorage[savename] = Encode(save);
 	}
 	
 	Game.Load = function() {
 		activeSave = Game.CreateSave();
 		
-		$.each(Decode(), function(i,j) {
-			if (typeof(j) !== 'object') {
-				activeSave[i] = ko.observable(j);
+		var save = Load(Decode());
+		
+		activeSave = save;
+	}
+	
+	function Load(obj) {
+		var ary = {};
+		$.each(obj, function(i,j) {
+			if (typeof(j) == 'object') {
+				ary[i] = Load(j);
 			} else {
-				activeSave[i] = j;
+				ary[i] = ko.observable(j);
 			}
 		});
+		return ary;
+	}
+	// obj is the object to save, ary is the array to save to
+	function Save(obj, ary) {
+		var save = {};
+		
+		$.each(obj, function(i, j) {
+			if (typeof(j) == 'function')
+				save[i] = j();
+			else if (typeof(j) == 'object')
+				save[i] = Save(j, save[i]);
+			else
+				save[i] = j;
+		});
+		
+		return save;
 	}
 	
 	function Encode(s) {
