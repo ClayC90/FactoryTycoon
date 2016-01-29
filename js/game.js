@@ -1,4 +1,4 @@
-$(function($) {
+$(function() {
 	/* Make Opera's version of document.hasFocus compatible */
 	if (!document.hasFocus)
 		document.hasFocus = function() { return document.hidden; };
@@ -8,14 +8,15 @@ $(function($) {
 		gameUpdate, autoSave;
 	
 	var Game = {};
-	window.Game = Game;
 	var activeSave;
-	window.activeSave = activeSave;
+	
+	window.Game = Game;
+	window.activeSave = function() { return activeSave; };
 	
 	/* Game Window init */
 	$(function() {
-		if (top == self)
-			Game.Start();
+		if (top == self) Game.Start();
+		else window.top.location = self.location.pathname;
 	});
 	
 	/* Game Start, Update */
@@ -42,9 +43,11 @@ $(function($) {
 		return {
 			Money: ko.observable(5000),
 			Building: window.Building,
+			Worker: window.Worker,
+			Resources: window.Resources,
 			Upgrades: {},
 			Stats: {},
-			version: 'alpha 1.0.0',
+			version: ko.observable('alpha 1.0.0'),
 			started: Date.now(),
 			lastSave: ko.observable(0),
 			lastFrame: ko.observable(Date.now())
@@ -78,7 +81,7 @@ $(function($) {
 		});
 		return ary;
 	}
-	// obj is the object to save, ary is the array to save to
+	
 	function Save(obj, ary) {
 		var save = {};
 		
