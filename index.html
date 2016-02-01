@@ -21,14 +21,15 @@
 				<h2>Factory Tycoon <small>The incremental simulator game</small></h2>
 			</div>
 			
-			<div class="col-xs-12">
-				<div class="col-xs-6 col-md-offset-2 col-md-4">
+			<div class="col-xs-12 col-md-offset-2 col-md-8">
+				<div class="col-xs-6">
 					<ul class="list-group">
 						<li class="list-group-item">
-							Money: &euro; <span data-bind="text: Money"></span>
+							Money: &euro; <span data-bind="text: Resources.Money"></span>
 						</li>
 						<li class="list-group-item">
 							Food: <span data-bind="text: Resources.Food"></span>
+							<button type="button" class="btn btn-default btn-sm" id="gather-food">Gather</button>
 						</li>
 						<li class="list-group-item">
 							Wood: <span data-bind="text: Resources.Wood"></span>
@@ -36,7 +37,7 @@
 					</ul>
 				</div>
 			
-				<div class="col-xs-6 col-md-4 form-horizontal">
+				<div class="col-xs-6 form-horizontal">
 					<div class="panel panel-default">
 						<div class="panel-heading">Training</div>
 						<table class="table table-hover">
@@ -76,6 +77,56 @@
 									<div class="btn-group" role="group">
 										<button type="button" class="btn btn-default btn-sm col-xs-6" id="hire-woodcutter">Hire</button>
 										<button type="button" class="btn btn-danger btn-sm col-xs-6" id="fire-woodcutter">Fire</button>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				
+				<div class="col-xs-12 form-horizontal">
+					<div class="panel panel-default">
+						<div class="panel-heading">Market</div>
+						<table class="table table-hover">
+							<tr>
+								<th class="col-xs-2">Food</th>
+								<td class="col-xs-5 text-right">
+									&euro;1 / kg
+									
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-primary btn-sm col-xs-4 buy-food" data-amount="1">Buy</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 buy-food" data-amount="10">x10</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 buy-food" data-amount="100">x100</button>
+									</div>
+								</td>
+								<td class="col-xs-5 text-right">
+									&euro;0.7 / kg
+									
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-primary btn-sm col-xs-4 sell-food" data-amount="1">Sell</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 sell-food" data-amount="10">x10</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 sell-food" data-amount="100">x100</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th class="col-xs-2">Wood</th>
+								<td class="col-xs-5 text-right">
+									&euro;5 / log
+									
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-primary btn-sm col-xs-4 buy-wood" data-amount="1">Buy</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 buy-wood" data-amount="10">x10</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 buy-wood" data-amount="100">x100</button>
+									</div>
+								</td>
+								<td class="col-xs-5 text-right">
+									&euro;3.7 / log
+									
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-primary btn-sm col-xs-4 sell-wood" data-amount="1">Sell</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 sell-wood" data-amount="10">x10</button>
+										<button type="button" class="btn btn-default btn-sm col-xs-4 sell-wood" data-amount="100">x100</button>
 									</div>
 								</td>
 							</tr>

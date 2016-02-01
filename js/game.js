@@ -35,13 +35,22 @@ $(function() {
 	}
 	
 	Game.Update = function() {
-		activeSave.lastFrame(Date.now());
+		if (activeSave.lastFrame() == undefined) activeSave.lastFrame(Date.now);
+		
+		var ms = Date.now() - activeSave.lastFrame();
+		
+		window.IdleWorkersTick(ms);
+		window.FarmersTick(ms);
+		window.WoodCuttersTick(ms);
+		
+		window.ViewModelTick();
+		
+		activeSave.lastFrame(activeSave.lastFrame() + ms);
 	}
 	
 	/* Load and Save Feature */	
 	Game.CreateSave = function() {
 		return {
-			Money: ko.observable(5000),
 			Building: window.Building,
 			Worker: window.Worker,
 			Resources: window.Resources,
@@ -58,40 +67,46 @@ $(function() {
 		activeSave.lastSave(Date.now());
 		
 		var save = Save(activeSave);
+		var savestring = Encode(save);
 		
-		localStorage[savename] = Encode(save);
+		localStorage[savename] = savestring;
 	}
 	
 	Game.Load = function() {
 		activeSave = Game.CreateSave();
 		
-		var save = Load(Decode());
+		var loadedSave = Load(activeSave, Decode());
 		
-		activeSave = save;
+		activeSave = loadedSave;
 	}
 	
-	function Load(obj) {
-		var ary = {};
-		$.each(obj, function(i,j) {
-			if (typeof(j) == 'object') {
-				ary[i] = Load(j);
-			} else {
-				ary[i] = ko.observable(j);
-			}
-		});
-		return ary;
+	function Load(defaultData, storedData) {
+		if (storedData)
+			$.each(storedData, function(index, data) {
+				if (typeof(data) == 'object') {
+					var loadedPiece = Load(defaultData[index], data);
+					
+					$.merge(defaultData[index], loadedPiece);
+				} else if (index.indexOf('precise') >= 0) {
+					defaultData[index] = data;
+				} else {
+					defaultData[index] = ko.observable(data);
+				}
+			});
+		
+		return defaultData;
 	}
 	
 	function Save(obj, ary) {
 		var save = {};
 		
-		$.each(obj, function(i, j) {
-			if (typeof(j) == 'function')
-				save[i] = j();
-			else if (typeof(j) == 'object')
-				save[i] = Save(j, save[i]);
+		$.each(obj, function(index, data) {
+			if (typeof(data) == 'function')
+				save[index] = data();
+			else if (typeof(data) == 'object')
+				save[index] = Save(data, save[index]);
 			else
-				save[i] = j;
+				save[index] = data;
 		});
 		
 		return save;
@@ -107,5 +122,12 @@ $(function() {
 		catch (e) {
 			alert(e);
 		}
+	}
+	
+	/* Helper Functions */
+	function ObjectLength(obj) {
+		var size = 0;
+		$.each(obj, function () { size++; });
+		return size;
 	}
 });
