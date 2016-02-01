@@ -44,7 +44,7 @@ $(function() {
 		   resources = window.activeSave().Resources;
 		
 		if (idle.Count() >= woodcutter.Cost.Idle() && 
-			resources.Food >= woodcutter.Cost.Food()) {
+			resources.preciseFood >= woodcutter.Cost.Food()) {
 			idle.Count(idle.Count() - woodcutter.Cost.Idle());
 			woodcutter.Count(woodcutter.Count() + 1);
 		}
