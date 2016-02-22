@@ -1,0 +1,27 @@
+.icon {
+	width: 32px;
+	height: 32px;
+	display: inline-block;
+	background-size: 100%;
+}
+.icon-sm {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	background-size: 100%;
+}
+.icon-food {
+	background-image: url('../images/food.png');
+}
+.icon-wood {
+	background-image: url('../images/wood.png');
+}
+.icon-idle-worker {
+	background-image: url('../images/worker.png');	
+}
+.icon-woodcutter {
+	background-image: url('../images/woodcutter.png');	
+}
+.icon-farmer {
+	background-image: url('../images/farmer.png');	
+}

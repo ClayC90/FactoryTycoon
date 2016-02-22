@@ -5,7 +5,7 @@ $(function() {
 
 	/* System Static Variables */
 	var savename = 'FTSave',
-		gameUpdate, autoSave;
+		gameUpdate, gameViewUpdate, autoSave;
 	
 	var Game = {};
 	var activeSave;
@@ -21,7 +21,7 @@ $(function() {
 	
 	/* Game Start, Update */
 	Game.Start = function() {
-		if (localStorage['FTSave'] != undefined) {
+		if (localStorage[savename] != undefined) {
 			Game.Load();
 		} else {
 			activeSave = Game.CreateSave();
@@ -29,6 +29,7 @@ $(function() {
 		}
 		
 		gameUpdate = setInterval(Game.Update,60);
+		gameUpdate = setInterval(Game.ViewUpdate,500);
 		autoSave = setInterval(Game.Save,2500);
 		
 		ko.applyBindings(activeSave);
@@ -39,13 +40,14 @@ $(function() {
 		
 		var ms = Date.now() - activeSave.lastFrame();
 		
-		window.IdleWorkersTick(ms);
 		window.FarmersTick(ms);
+		window.IdleWorkersTick(ms);
 		window.WoodCuttersTick(ms);
 		
-		window.ViewModelTick();
-		
 		activeSave.lastFrame(activeSave.lastFrame() + ms);
+	}
+	Game.ViewUpdate = function () {
+		window.ViewModelTick();
 	}
 	
 	/* Load and Save Feature */	
@@ -56,7 +58,7 @@ $(function() {
 			Resources: window.Resources,
 			Upgrades: {},
 			Stats: {},
-			version: ko.observable('alpha 1.0.0'),
+			version: ko.observable('alpha 1.0.1'),
 			started: Date.now(),
 			lastSave: ko.observable(0),
 			lastFrame: ko.observable(Date.now())
@@ -78,19 +80,31 @@ $(function() {
 		var loadedSave = Load(activeSave, Decode());
 		
 		activeSave = loadedSave;
+		
+		activeSave.Resources.FoodCapacity(window.Capacity.Food());
+		activeSave.Resources.WoodCapacity(window.Capacity.Wood());
+		
+		activeSave.Resources.FarmersCapacity(window.Capacity.Farmers());
+		activeSave.Resources.WoodCutterCapacity(window.Capacity.WoodCutter());
 	}
 	
 	function Load(defaultData, storedData) {
 		if (storedData)
 			$.each(storedData, function(index, data) {
-				if (typeof(data) == 'object') {
-					var loadedPiece = Load(defaultData[index], data);
-					
-					$.merge(defaultData[index], loadedPiece);
-				} else if (index.indexOf('precise') >= 0) {
-					defaultData[index] = data;
+				if (index == 'Building' || index == 'Worker') {
+					$.each(data, function(i, d) {
+						defaultData[index][i].Count(d);
+					});
 				} else {
-					defaultData[index] = ko.observable(data);
+					if (typeof(data) == 'object') {
+						var loadedPiece = Load(defaultData[index], data);
+						
+						$.merge(defaultData[index], loadedPiece);
+					} else if (index.indexOf('precise') >= 0) {
+						defaultData[index] = data;
+					} else {
+						defaultData[index] = ko.observable(data);
+					}
 				}
 			});
 		
@@ -101,12 +115,22 @@ $(function() {
 		var save = {};
 		
 		$.each(obj, function(index, data) {
-			if (typeof(data) == 'function')
-				save[index] = data();
-			else if (typeof(data) == 'object')
-				save[index] = Save(data, save[index]);
-			else
-				save[index] = data;
+			if (index.indexOf('PerSec') < 0 && index.indexOf('psec') < 0)
+				if (index == 'Building' || index == 'Worker') {
+					var bw = {};
+					$.each(data, function(i,d) {
+						if (i != "length")
+							bw[i] = d.Count();
+					});
+					save[index] = bw;
+				} else {
+					if (typeof(data) == 'function')
+						save[index] = data();
+					else if (typeof(data) == 'object')
+						save[index] = Save(data, save[index]);
+					else
+						save[index] = data;
+				}
 		});
 		
 		return save;

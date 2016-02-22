@@ -1,33 +1,69 @@
 $(function() {
 	window.IdleWorkersTick = function(ms) {
 		var count = window.activeSave().Worker.Idle.Count(),
-			consume = window.activeSave().Worker.Idle.Consumes.Food(),
 			resources = window.activeSave().Resources;
-		
-		window.activeSave().Resources.preciseFood -= ((count * consume) / 1000 * ms);
 	}
 	window.FarmersTick = function(ms) {
-		var count = window.activeSave().Worker.Farmers.Count(),
-			consume = window.activeSave().Worker.Farmers.Consumes.Food(),
-			produce = window.activeSave().Worker.Farmers.Produce.Food(),
-			resources = window.activeSave().Resources;
+		var worker = window.activeSave().Worker,
+			count = worker.Farmers.Count(),
+			resources = window.activeSave().Resources,
+			building = window.activeSave().Building,
+			production = worker.Farmers.Produce.Food() * worker.Farmers.Count(),
+			consumption = 0;
+			
+		$.each(worker, function(index, data) {
+			consumption += data.Consumes.Food() * data.Count();
+		});
 		
-		window.activeSave().Resources.preciseFood += ((count * produce) / 1000 * ms);
-		window.activeSave().Resources.preciseFood -= ((count * consume) / 1000 * ms);
+		var change = (production - consumption) / 1000 * ms;
+		
+		if (resources.preciseFood + change >= resources.FoodCapacity())
+			resources.preciseFood = resources.FoodCapacity();
+		else
+			resources.preciseFood += change;
 	}
 	window.WoodCuttersTick = function(ms) {
 		var count = window.activeSave().Worker.WoodCutter.Count(),
-			consume = window.activeSave().Worker.WoodCutter.Consumes.Food(),
 			produce = window.activeSave().Worker.WoodCutter.Produce.Wood(),
-			resources = window.activeSave().Resources;
+			resources = window.activeSave().Resources,
+			building = window.activeSave().Building;
 		
-		window.activeSave().Resources.preciseWood += ((count * produce) / 1000 * ms);
-		window.activeSave().Resources.preciseFood -= ((count * consume) / 1000 * ms);
+		if (resources.preciseWood + produce > resources.WoodCapacity())
+			resources.preciseWood = resources.WoodCapacity();
+		else
+			resources.preciseWood += ((count * produce) / 1000 * ms);
 	}
-	
+
 	window.ViewModelTick = function() {
-		window.activeSave().Resources.Money(Math.round(window.activeSave().Resources.preciseMoney));
-		window.activeSave().Resources.Food(Math.round(window.activeSave().Resources.preciseFood));
-		window.activeSave().Resources.Wood(Math.round(window.activeSave().Resources.preciseWood));
+		var resources = window.activeSave().Resources;
+		
+		resources.Money(Math.round(window.activeSave().Resources.preciseMoney));
+		resources.Food(Math.round(window.activeSave().Resources.preciseFood));
+		resources.Wood(Math.round(window.activeSave().Resources.preciseWood));
+		
+		// Per Second
+		var foodPerSec = 0,
+			woodPerSec = 0;
+		
+		$.each(window.activeSave().Worker, function(index, data) {
+			if (index == 'Farmers')
+				foodPerSec += (data.Produce.Food() * data.Count());
+			
+			if (index == 'WoodCutter')
+				woodPerSec += (data.Produce.Wood() * data.Count());
+			
+			foodPerSec -= (data.Consumes.Food() * data.Count());
+		});
+		
+		resources.foodpsec(foodPerSec);
+		resources.woodpsec(woodPerSec);
+	}
+	window.TotalWorkers = function() {
+		var count = 0;
+		$.each(window.activeSave().Worker, function(index, worker) {
+			if (index != 'length')
+				count += worker.Count();
+		});
+		return count;
 	}
 });
