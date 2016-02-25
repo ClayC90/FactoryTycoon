@@ -5,7 +5,7 @@ $(function() {
 
 	/* System Static Variables */
 	var savename = 'FTSave',
-		gameUpdate, gameViewUpdate, autoSave;
+		gameUpdate, gameViewUpdate, autoSave, gapulse;
 	
 	var Game = {};
 	var activeSave;
@@ -31,6 +31,12 @@ $(function() {
 		gameUpdate = setInterval(Game.Update,60);
 		gameUpdate = setInterval(Game.ViewUpdate,500);
 		autoSave = setInterval(Game.Save,2500);
+		gapulse = setInterval(fun)
+		
+		var gapulse = function() {
+			ga('send', 'pulse', gameWindowStatus);
+			setTimeout(gapulse, 30000);
+		}
 		
 		ko.applyBindings(activeSave);
 	}
