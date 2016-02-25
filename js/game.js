@@ -34,7 +34,7 @@ $(function() {
 		gapulse = setInterval(fun)
 		
 		var gapulse = function() {
-			ga('send', 'pulse', gameWindowStatus);
+			ga('send', 'pulsealpha');
 			setTimeout(gapulse, 30000);
 		}
 		

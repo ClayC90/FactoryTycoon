@@ -198,11 +198,11 @@ $(function() {
 	
 	$('#open-training').click(function() {
 		building.slideUp(function() { training.slideDown(); });
-		ga('send', 'tab', 'training');
+		ga('send', 'tab-training');
 	});
 	$('#open-building').click(function() {
 		training.slideUp(function() { building.slideDown(); });
-		ga('send', 'tab', 'building');
+		ga('send', 'tab-building');
 	});
 	
 	/* MARKET */
