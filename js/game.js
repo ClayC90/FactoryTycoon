@@ -31,9 +31,8 @@ $(function() {
 		gameUpdate = setInterval(Game.Update,60);
 		gameUpdate = setInterval(Game.ViewUpdate,500);
 		autoSave = setInterval(Game.Save,2500);
-		gapulse = setInterval(fun)
 		
-		var gapulse = function() {
+		gapulse = function() {
 			ga('send', 'pulsealpha');
 			setTimeout(gapulse, 30000);
 		}
